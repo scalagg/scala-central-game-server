@@ -25,7 +25,7 @@ object CgsPacketService {
         println("generatedName = $generatedName, serverGroup = $serverGroup, teamSize = $teamSize, gameType = $gameType")
 
         try {
-//            CgsGameEngine.createServer(generatedName, serverGroup, teamSize, gameType)
+            CgsGameEngine.createServer(generatedName, serverGroup, teamSize, gameType)
 
             val successMessage = mapOf(
                 "serverName" to generatedName,

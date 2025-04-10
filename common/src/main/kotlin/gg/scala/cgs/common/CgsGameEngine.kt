@@ -10,6 +10,8 @@ import gg.scala.cloudsync.shared.connection.CloudSyncConnector
 import org.apache.commons.io.FileUtils
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.charset.StandardCharsets
@@ -51,73 +53,90 @@ class CgsGameEngine {
             return templateDir.exists() && templateDir.isDirectory
         }
 
-//        @Throws(Exception::class)
-//        fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
-//            if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
-//
-//            val gameTypeEnum = GameType.getGameByDisplayName(group) ?: GameType.valueOf(group.uppercase())
-//            val templateDir = File("$templatePath$group")
-//            if (!templateDir.exists() || !templateDir.isDirectory)
-//                throw IllegalArgumentException("No template found for group '$group'.")
-//
-//            val targetDir = File("$dockerTemp$serverName")
-//            if (targetDir.exists()) FileUtils.deleteDirectory(targetDir)
-//
-//            // Find available port
-//            val port = findFreePort()
-//
-//            // Copy docker setup
-//            FileUtils.copyDirectory(File(dockerBase), targetDir)
-//            replace(File(targetDir, "deploy.sh"), "port=25565", "port=$port")
-//            replace(File(targetDir, "deploy.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
-//            replace(File(targetDir, "startup.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
-//            replace(File(targetDir, "down.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
-//
-//            replace(File(targetDir, "deploy.sh"), "servername=CGSServer", "servername=$serverName")
-//            replace(File(targetDir, "startup.sh"), "servername=CGSServer", "servername=$serverName")
-//            replace(File(targetDir, "down.sh"), "servername=CGSServer", "servername=$serverName")
-//
-//            // Copy template
-//            val serverFiles = File(targetDir, "serverfiles")
-//            FileUtils.copyDirectory(templateDir, serverFiles)
-//
-//            replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
-//            replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
-//            replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "id: template", "id: $serverName")
-//
-//            var teamSizeValue = 1
-//            var gameTypeValue = "Regular"
-//
-//            CloudSyncConnector.useTrackedAssets { _, metadata, _ ->
-//                val pluginDir = File(serverFiles, "plugins/${metadata.uri}")
-//                if (pluginDir.exists()) {
-//                    val groupConfig = File(pluginDir, "config.yml")
-//                    if (groupConfig.exists()) {
-//                        val yaml = Yaml()
-//                        val data = yaml.load<Map<String, Any>>(groupConfig.inputStream())
-//                        teamSizeValue = data["teamSize"] as? Int ?: teamSizeValue
-//                        gameTypeValue = data["gameType"] as? String ?: gameTypeValue
-//                    }
-//                }
-//
-//                replace(File(serverFiles, "plugins/${metadata.uri}/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
-//                replace(File(serverFiles, "plugins/${metadata.uri}/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
-//            }
-//
-//            setPermissions(targetDir)
-//            startServer(targetDir)
-//
-//            TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
-//
-//            CgsPacketService.buildMessage(
-//                "velocity-server",
-//                mapOf(
-//                    "serverName" to serverName,
-//                    "serverHost" to "127.0.0.1",
-//                    "port" to port.toString()
-//                )
-//            ).publish(AwareThreadContext.SYNC)
-//        }
+        @Throws(Exception::class)
+        fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
+            if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
+
+            val gameTypeEnum = GameType.getGameByDisplayName(group) ?: GameType.valueOf(group.uppercase())
+            val templateDir = File("$templatePath$group")
+            if (!templateDir.exists() || !templateDir.isDirectory)
+                throw IllegalArgumentException("No template found for group '$group'.")
+
+            val targetDir = File("$dockerTemp$serverName")
+            if (targetDir.exists()) FileUtils.deleteDirectory(targetDir)
+
+            // Find available port
+            val port = findFreePort()
+
+            // Copy docker setup
+            FileUtils.copyDirectory(File(dockerBase), targetDir)
+            replace(File(targetDir, "deploy.sh"), "port=25565", "port=$port")
+            replace(File(targetDir, "deploy.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
+            replace(File(targetDir, "startup.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
+            replace(File(targetDir, "down.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
+
+            replace(File(targetDir, "deploy.sh"), "servername=CGSServer", "servername=$serverName")
+            replace(File(targetDir, "startup.sh"), "servername=CGSServer", "servername=$serverName")
+            replace(File(targetDir, "down.sh"), "servername=CGSServer", "servername=$serverName")
+
+            // Copy template
+            val serverFiles = File(targetDir, "serverfiles")
+            FileUtils.copyDirectory(templateDir, serverFiles)
+
+            replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
+            replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
+            replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "id: template", "id: $serverName")
+
+            var teamSizeValue = 1
+            var gameTypeValue = "Regular"
+
+            /*CloudSyncConnector.useTrackedAssets { _, _, componentMetadata ->
+                val pluginDir = File(serverFiles, "plugins/${componentMetadata.uri}")
+                if (pluginDir.exists()) {
+                    val groupConfig = File(pluginDir, "config.yml")
+                    if (groupConfig.exists()) {
+                        val yaml = Yaml()
+                        val data = yaml.load<Map<String, Any>>(groupConfig.inputStream())
+                        teamSizeValue = data["teamSize"] as? Int ?: teamSizeValue
+                        gameTypeValue = data["gameType"] as? String ?: gameTypeValue
+                    }
+                }
+
+                replace(File(serverFiles, "plugins/${componentMetadata.uri}/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
+                replace(File(serverFiles, "plugins/${componentMetadata.uri}/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
+            }*/
+
+            //todo: what the fuck is going on up there bruh
+
+            val pluginDir = File(templateDir, "/plugins/" + gameTypeEnum.pluginName)
+            if (pluginDir.exists()) {
+                val groupConfig = File(pluginDir, "/config.yml")
+                if (groupConfig.exists()) {
+                    val inputStream: InputStream = FileInputStream(groupConfig)
+                    val yaml = Yaml()
+                    val data = yaml.load<Any>(inputStream) as Map<*, *>
+                    teamSizeValue = data["teamSize"] as Int
+                    gameTypeValue = (data["gameType"] as String?)!!
+                }
+
+                replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
+                replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
+            }
+
+            setPermissions(targetDir)
+            startServer(targetDir)
+
+            TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
+
+            CgsPacketService.buildMessage(
+                "velocity-server",
+                mapOf(
+                    "serverName" to serverName,
+                    "serverHost" to "127.0.0.1",
+                    "port" to port.toString()
+                )
+            ).publish(AwareThreadContext.SYNC)
+        }
 
         private fun replace(file: File, from: String, to: String) {
             val content = String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8)
