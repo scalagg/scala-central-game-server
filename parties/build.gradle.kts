@@ -1,0 +1,3 @@
+dependencies {
+    compileOnly("gg.scala.basics.plugin:scala-basics-plugin:1.0.5")
+}
