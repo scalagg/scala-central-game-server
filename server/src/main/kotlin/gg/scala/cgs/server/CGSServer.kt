@@ -27,6 +27,7 @@ class CGSServer {
             println("[CGS] CGS config not found...")
             exitProcess(0)
         }
+        println("[CGS] Loaded Config.")
 
         val delay = 10000L
         val timer = Timer()
@@ -89,5 +90,6 @@ class CGSServer {
                 }
             }
         }.start()
+        println("[CGS] Started CGS Server...")
     }
 }
