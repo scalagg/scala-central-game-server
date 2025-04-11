@@ -28,13 +28,11 @@ class CGSServer {
             exitProcess(0)
         }
         println("[CGS] Loaded Config.")
-        println("[CGS] Loading Aware...")
-        println("[CGS] Loaded Aware.")
 
         val delay = 10000L
         val timer = Timer()
         timer.scheduleAtFixedRate(GenerateGameServerTask(), delay, 5000L)
-//        timer.scheduleAtFixedRate(GenerateTeamGameServerTask(), delay, 5000L)
+        timer.scheduleAtFixedRate(GenerateTeamGameServerTask(), delay, 5000L)
 
         Thread {
             while (running) {

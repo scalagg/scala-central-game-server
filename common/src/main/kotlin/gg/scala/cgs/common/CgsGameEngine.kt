@@ -31,7 +31,6 @@ class CgsGameEngine {
         private val dockerBase = "/home/templates/docker_instances/base"
         private val dockerTemp = "/home/templates/docker_instances/temp/"
 
-        private val recentServers = ConcurrentHashMap<String, Long>()
         val TEMP_SERVERS: MutableList<TempServer> = mutableListOf()
 
         fun findAvailableServerId(group: String): Int {
@@ -49,20 +48,9 @@ class CgsGameEngine {
             return -1
         }
 
-        fun doesTemplateExist(group: String): Boolean {
-            val templateDir = File("$templatePath$group")
-            return templateDir.exists() && templateDir.isDirectory
-        }
-
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
-
-            // Avoid duplicate creation
-            if (isDuplicate(serverName)) {
-                println("[WARN] Ignored duplicate create request for $serverName")
-                return
-            }
 
             println("[DEBUG] Starting server creation for $serverName...")
 
@@ -76,6 +64,10 @@ class CgsGameEngine {
 
             val port = findFreePort()
 
+            val serverFiles = File(targetDir, "serverfiles")
+            println("Copying template from ${templateDir.absolutePath} to ${serverFiles.absolutePath}")
+            safeCopyDirectory(templateDir, serverFiles)
+
             FileUtils.copyDirectory(File(dockerBase), targetDir)
             replace(File(targetDir, "deploy.sh"), "port=25565", "port=$port")
             replace(File(targetDir, "deploy.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
@@ -84,11 +76,6 @@ class CgsGameEngine {
             replace(File(targetDir, "deploy.sh"), "servername=CGSServer", "servername=$serverName")
             replace(File(targetDir, "startup.sh"), "servername=CGSServer", "servername=$serverName")
             replace(File(targetDir, "down.sh"), "servername=CGSServer", "servername=$serverName")
-
-            val serverFiles = File(targetDir, "serverfiles")
-            println("Copying template from ${templateDir.absolutePath} to ${serverFiles.absolutePath}")
-            safeCopyDirectory(templateDir, serverFiles)
-
             replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
             replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
             replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "id: template", "id: $serverName")
@@ -97,14 +84,16 @@ class CgsGameEngine {
             var gameTypeValue = "Regular"
 
             val pluginDir = File(templateDir, "/plugins/" + gameTypeEnum.pluginName)
+            println("pluginDir = /plugins/${gameTypeEnum.pluginName}")
             if (pluginDir.exists()) {
                 val groupConfig = File(pluginDir, "/config.yml")
                 if (groupConfig.exists()) {
                     val inputStream: InputStream = FileInputStream(groupConfig)
                     val yaml = Yaml()
                     val data = yaml.load<Any>(inputStream) as Map<*, *>
+                    println("teamSizeValue = ${data["teamSize"] as Int} && gameTypeValue = ${data["gameType"] as String}")
                     teamSizeValue = data["teamSize"] as Int
-                    gameTypeValue = (data["gameType"] as String?)!!
+                    gameTypeValue = data["gameType"] as String
                 }
 
                 replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
@@ -169,14 +158,6 @@ class CgsGameEngine {
                 println("Error copying directory from ${src.absolutePath} to ${dest.absolutePath}")
                 throw e
             }
-        }
-
-        private fun isDuplicate(serverName: String): Boolean {
-            val now = System.currentTimeMillis()
-            val last = recentServers[serverName] ?: 0
-            if (now - last < 3000) return true
-            recentServers[serverName] = now
-            return false
         }
     }
 }

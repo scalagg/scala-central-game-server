@@ -47,7 +47,7 @@ enum class GameType(
             "obtain items to help you",
             "be the last man standing!"
         ),
-        maxTeamSize = 1,
+        maxTeamSize = 2, // TODO: temporary
         maxTeamServers = 0,
         autoCreateServers = false,
         publicStats = true,
