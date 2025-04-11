@@ -10,5 +10,5 @@ import gg.scala.commons.config.annotations.Config
 @Config("config", crossSync = false)
 class CgsSpigotConfig {
 
-    var gameType = "POT_SG"
+    val gameType = "POT_SG"
 }

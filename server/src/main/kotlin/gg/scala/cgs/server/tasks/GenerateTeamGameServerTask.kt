@@ -1,8 +1,8 @@
 package gg.scala.cgs.server.tasks
 
-import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.common.packet.CgsPacketService
+import gg.scala.cgs.common.packet.impl.RequestServerPacket
 import gg.scala.commons.agnostic.sync.server.ServerContainer
 import java.util.*
 
@@ -11,44 +11,40 @@ class GenerateTeamGameServerTask : TimerTask() {
 
     override fun run() {
         val requestPassed = System.currentTimeMillis() - lastServerRequest
-        if (requestPassed <= 20000L) {
-            println("Ignoring as team request was sent less than 20 seconds ago: $requestPassed")
+        if (requestPassed <= 20_000L) {
+            println("Ignoring as team request was sent less than 20 seconds ago: $requestPassed ms")
             return
         }
 
-        for (value in GameType.entries) {
-            if (!value.autoCreateServers) continue
+        for (gameType in GameType.entries) {
+            if (!gameType.autoCreateServers) continue
 
-            val maxAvailable: Int = value.maxTeamServers
+            val maxAvailable = gameType.maxTeamServers
             var availableGames = 0
             var onlineServers = 0
-
             var hasInGame = false
 
-           for (server in ServerContainer.getServersInGroup(value.serverName)) {
-               if (server.getMetadataValue<String>("game", "stageType") == null || server.getMetadataValue<Int>("game", "gameTeamSize") != null) continue
-               if (server.getMetadataValue<Int>("game", "gameTeamSize") != value.maxTeamSize) continue
+            val servers = ServerContainer.getServersInGroup(gameType.serverName)
+            for (server in servers) {
+                val gameStage = server.getMetadataValue<String>("game", "stageType")
+                val teamSize = server.getMetadataValue<Int>("game", "gameTeamSize")
 
-               onlineServers++
+                if (gameStage == null || teamSize == null || teamSize != gameType.maxTeamSize) continue
 
-               val gameStage = server.getMetadataValue<String>("game", "stageType")
-
-                if (gameStage.equals("IN_GAME")) hasInGame = true
-                else if (gameStage.equals("setup") || gameStage.equals("pre_game") || gameStage.equals("voting") || gameStage.equals("starting")) availableGames++
+                onlineServers++
+                when (gameStage.lowercase()) {
+                    "in_game" -> hasInGame = true
+                    "setup", "pre_game", "voting", "starting" -> availableGames++
+                }
             }
 
-            if (onlineServers < value.maxTeamServers || (availableGames == 0 && hasInGame)) {
-                if (availableGames < maxAvailable) {
-                    println("Generating team game...")
+            val shouldCreate = onlineServers < maxAvailable || (availableGames == 0 && hasInGame)
+            if (shouldCreate && availableGames < maxAvailable) {
+                println("Generating team game for ${gameType.serverName}...")
 
-                    CgsPacketService.buildMessage(
-                        "request-server",
-                        mapOf("serverName" to value.serverName,
-                            "maxTeamSize" to value.maxTeamSize.toString())
-                    ).publish(AwareThreadContext.SYNC)
+                CgsPacketService.sendToAll(RequestServerPacket(gameType.serverName, gameType.maxTeamSize))
 
-                    lastServerRequest = System.currentTimeMillis()
-                }
+                lastServerRequest = System.currentTimeMillis()
             }
         }
     }

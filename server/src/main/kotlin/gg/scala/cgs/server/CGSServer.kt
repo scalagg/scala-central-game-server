@@ -2,6 +2,7 @@ package gg.scala.cgs.server
 
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.packet.CgsPacketService
+import gg.scala.cgs.common.packet.impl.GameServerPacket
 import gg.scala.cgs.common.server.TempServer
 import gg.scala.cgs.server.tasks.GenerateGameServerTask
 import gg.scala.cgs.server.tasks.GenerateTeamGameServerTask
@@ -13,7 +14,7 @@ class CGSServer {
 
     var instance: CGSServer? = null
     private var running: Boolean = true
-    private val broken: MutableList<TempServer> = java.util.ArrayList<TempServer>() // lol
+    private val broken: MutableList<TempServer> = ArrayList<TempServer>() // lol
 
     fun init() {
         instance = this
@@ -28,6 +29,10 @@ class CGSServer {
             exitProcess(0)
         }
         println("[CGS] Loaded Config.")
+
+        println("[CGS] Loading CGS Packet Service...")
+        CgsGameEngine.initPacketHandler()
+        println("[CGS] Loaded CGS Packet Service.")
 
         val delay = 10000L
         val timer = Timer()
@@ -76,11 +81,13 @@ class CGSServer {
                     } catch (ex: Exception) {
                         System.err.println("[CGS] Couldn't destroy '" + server.name + "'!")
                         ex.printStackTrace()
-                        CgsPacketService.buildMessage(
-                            "game-server",
-                            mapOf("serverName" to server.name,
-                                "message" to "Failed to destroy '" + server.name + "': " + ex.message)
-                        ).publish()
+                        CgsPacketService.sendToAll(
+                            GameServerPacket(
+                                server.name,
+                                "Failed to destroy '" + server.name + "': " + ex.message
+                            )
+                        )
+
                     }
                 }
 

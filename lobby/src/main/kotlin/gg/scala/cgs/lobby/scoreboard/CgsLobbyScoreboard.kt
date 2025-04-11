@@ -23,7 +23,7 @@ abstract class CgsLobbyScoreboard : ScoreboardAdapter() {
     private var queues = 0
 
     override fun getTitle(player: Player): String {
-        return CgsLobbyConfig.title.replace("%type%", CgsSpigotPlugin.gameType.displayName)
+        return CgsLobbyConfig.title.replace("%type%", CgsSpigotPlugin.gameType!!.displayName)
     }
 
     override fun getLines(board: LinkedList<String>, player: Player) {
@@ -54,7 +54,7 @@ abstract class CgsLobbyScoreboard : ScoreboardAdapter() {
                     lines.add(
                         CgsLobbyConfig.party
                             .replace("%members%", (party.members.size + 1).toString())
-                            .replace("%max%", CgsSpigotPlugin.gameType.maxPartySize.toString())
+                            .replace("%max%", CgsSpigotPlugin.gameType!!.maxPartySize.toString())
                     )
                 }
 

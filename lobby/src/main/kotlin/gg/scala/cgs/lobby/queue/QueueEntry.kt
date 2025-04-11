@@ -40,44 +40,44 @@ class QueueEntry(
     }
 
     fun sendToServer(server: String, instant: Boolean = false) {
-        when {
-            isSingleQueue -> {
-                val onlinePlayer = Bukkit.getPlayer(player!!)
-                if (onlinePlayer == null || !onlinePlayer.isOnline) return
-
-                if (instant) {
-                    BungeeUtil.sendToServer(onlinePlayer, server)
-                } else {
-                    JoinFastServerCommand.join(onlinePlayer, server)
-                }
-            }
-            isPartyQueue -> {
-                CgsPacketService.buildMessage(
-                    "setup-party",
-                    mapOf(
-                        "party" to Gson().toJson(party),
-                        "server" to server
-                    )
-                ).publish()
-                val leader = Bukkit.getPlayer(party!!.leader.uniqueId)
-                leader?.takeIf { it.isOnline }?.let {
-                    if (instant) {
-                        BukkitUtil.sendPlayer(ScGameLobby.instance, it, server)
-                    } else {
-                        JoinFastServerCommand.join(it, server)
-                    }
-                }
-
-                party.includedMembersOnline().forEach { onlineMember ->
-                    if (instant) {
-                        BukkitUtil.sendPlayer(ScGameLobby.instance, Bukkit.getPlayer(onlineMember), server)
-                    } else {
-                        JoinFastServerCommand.join(Bukkit.getPlayer(onlineMember), server)
-                    }
-                }
-            }
-            else -> throw IllegalStateException("Invalid entry")
-        }
+//        when {
+//            isSingleQueue -> {
+//                val onlinePlayer = Bukkit.getPlayer(player!!)
+//                if (onlinePlayer == null || !onlinePlayer.isOnline) return
+//
+//                if (instant) {
+//                    BungeeUtil.sendToServer(onlinePlayer, server)
+//                } else {
+//                    JoinFastServerCommand.join(onlinePlayer, server)
+//                }
+//            }
+//            isPartyQueue -> {
+//                CgsPacketService.buildMessage(
+//                    "setup-party",
+//                    mapOf(
+//                        "party" to Gson().toJson(party),
+//                        "server" to server
+//                    )
+//                ).publish()
+//                val leader = Bukkit.getPlayer(party!!.leader.uniqueId)
+//                leader?.takeIf { it.isOnline }?.let {
+//                    if (instant) {
+//                        BukkitUtil.sendPlayer(ScGameLobby.instance, it, server)
+//                    } else {
+//                        JoinFastServerCommand.join(it, server)
+//                    }
+//                }
+//
+//                party.includedMembersOnline().forEach { onlineMember ->
+//                    if (instant) {
+//                        BukkitUtil.sendPlayer(ScGameLobby.instance, Bukkit.getPlayer(onlineMember), server)
+//                    } else {
+//                        JoinFastServerCommand.join(Bukkit.getPlayer(onlineMember), server)
+//                    }
+//                }
+//            }
+//            else -> throw IllegalStateException("Invalid entry")
+//        }
     }
 
     fun contains(uuid: UUID): Boolean {

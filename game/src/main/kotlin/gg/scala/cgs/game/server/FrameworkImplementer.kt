@@ -11,7 +11,7 @@ class FrameworkImplementer {
 
         ServerSync.getLocalGameServer()
             .setMetadata(
-                "game", "game-type", CgsSpigotPlugin.gameType.name
+                "game", "game-type", CgsSpigotPlugin.gameType!!.name
             )
         ServerSync.getLocalGameServer()
             .setMetadata(

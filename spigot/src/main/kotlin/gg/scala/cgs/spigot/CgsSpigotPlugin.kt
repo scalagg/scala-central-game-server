@@ -4,6 +4,8 @@ import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.spigot.config.CgsSpigotConfig
 import gg.scala.commons.ExtendedScalaPlugin
+import gg.scala.commons.agnostic.sync.ServerSync
+import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.*
 import org.bukkit.Bukkit
@@ -33,7 +35,7 @@ class CgsSpigotPlugin : ExtendedScalaPlugin() {
         lateinit var instance: CgsSpigotPlugin
 
         @JvmStatic
-        lateinit var gameType: GameType
+        var gameType: GameType? = null
         @JvmStatic
         val season = 1
     }
@@ -46,15 +48,20 @@ class CgsSpigotPlugin : ExtendedScalaPlugin() {
         instance = this
         saveDefaultConfig()
 
+        CgsGameEngine.initPacketHandler()
+
         try {
-            gameType =
-                GameType.valueOf(getConfig().getString("gameType").uppercase(Locale.getDefault()))
+            gameType = GameType.valueOf(getConfig().getString("game-type").uppercase(Locale.getDefault()))
         } catch (ex: Exception) {
             Bukkit.getLogger().severe(
-                "Invalid gameType in config! Valid types: " + Arrays.stream(GameType.values())
+                "Invalid game-type in config! Valid types: " + Arrays.stream(GameType.entries.toTypedArray())
                     .map { obj: Enum<*> -> obj.name }
                     .collect(Collectors.joining(", ")))
             Bukkit.shutdown()
+        }
+
+        if (ServerSync.getLocalGameServer().groups.contains("hub")) {
+            gameType = null
         }
     }
 }

@@ -31,7 +31,7 @@ data class TempServer(
 
     @Throws(Exception::class)
     fun destroy() {
-        ProcessBuilder("sudo", "chown", "scala:scala", "serverfiles")
+        ProcessBuilder("sudo", "chown", "root:root", "serverfiles")
             .directory(directory)
             .start()
 

@@ -36,6 +36,7 @@ subprojects {
 
     dependencies {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+        implementation("redis.clients:jedis:2.8.0")
 
         compileOnly("gg.scala.lemon:bukkit:1.9.0")
         compileOnly("gg.scala.spigot:server:1.1.0")

@@ -2,6 +2,7 @@ package gg.scala.cgs.spigot.commands
 
 import gg.scala.basics.plugin.commands.admin.ShutdownCommand
 import gg.scala.cgs.common.packet.CgsPacketService
+import gg.scala.cgs.common.packet.impl.RequestServerPacket
 import gg.scala.commons.acf.CommandHelp
 import gg.scala.commons.acf.annotation.*
 import gg.scala.commons.agnostic.sync.server.ServerContainer
@@ -11,10 +12,10 @@ import net.evilblock.cubed.util.CC
 import net.evilblock.cubed.util.time.Duration
 import org.apache.commons.io.FileUtils
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import java.io.File
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 
 /**
  * @author Topu
@@ -53,17 +54,14 @@ object CgsAdminCommands : ScalaCommand() {
             }
         }
 
-        CgsPacketService.buildMessage(
-            "request-server",
-            mapOf(
-                "serverGroup" to serverGroup,
-                "teamSize" to teamSize.toString(),
-                "gameType" to gameType,
-                "serverName" to serverName
-            )
-        ).publish()
-
-        sender.sendMessage("${CC.GREEN}Requested server with group: $serverGroup (teamSize: $teamSize, gameType: $gameType)")
+        CgsPacketService.sendToAll(
+            (if (serverName == "§") RequestServerPacket(
+                serverGroup,
+                teamSize,
+                gameType
+            ) else RequestServerPacket(serverName, serverGroup, teamSize, gameType))
+        )
+        sender.sendMessage(ChatColor.GREEN.toString() + "We have requested a server to be made with the group: " + serverGroup + "(teamSize: " + teamSize + ", gameType: " + gameType + ")")
     }
 
     @Subcommand("template edit")
@@ -76,15 +74,8 @@ object CgsAdminCommands : ScalaCommand() {
             return
         }
 
-        CgsPacketService.buildMessage(
-            "request-server",
-            mapOf(
-                "serverGroup" to serverGroup,
-                "serverName" to "$serverGroup-Template"
-            )
-        ).publish()
-
-        sender.sendMessage("${CC.GREEN}We have requested a template edit server to be made with the group: $serverGroup.")
+        CgsPacketService.sendToAll(RequestServerPacket("$serverGroup-Template", serverGroup))
+        sender.sendMessage(ChatColor.GREEN.toString() + "We have requested a template edit server to be made with the group: " + serverGroup)
     }
 
     @Subcommand("template save")
