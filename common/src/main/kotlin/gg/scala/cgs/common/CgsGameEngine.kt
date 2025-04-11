@@ -25,9 +25,9 @@ import kotlin.properties.Delegates
 class CgsGameEngine {
 
     companion object {
-        private val templatePath = "/root/templates/"
-        private val dockerBase = "/root/docker_instances/base"
-        private val dockerTemp = "/root/docker_instances/temp/"
+        private val templatePath = "/home/templates/templates/"
+        private val dockerBase = "/home/templates/docker_instances/base"
+        private val dockerTemp = "/home/templates/docker_instances/temp/"
 
         val TEMP_SERVERS: MutableList<TempServer> = mutableListOf()
 
@@ -70,9 +70,9 @@ class CgsGameEngine {
             // Copy docker setup
             FileUtils.copyDirectory(File(dockerBase), targetDir)
             replace(File(targetDir, "deploy.sh"), "port=25565", "port=$port")
-            replace(File(targetDir, "deploy.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
-            replace(File(targetDir, "startup.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
-            replace(File(targetDir, "down.sh"), "path=/root/mcdeploy", "path=${targetDir.absolutePath}")
+            replace(File(targetDir, "deploy.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
+            replace(File(targetDir, "startup.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
+            replace(File(targetDir, "down.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
 
             replace(File(targetDir, "deploy.sh"), "servername=CGSServer", "servername=$serverName")
             replace(File(targetDir, "startup.sh"), "servername=CGSServer", "servername=$serverName")
@@ -88,24 +88,6 @@ class CgsGameEngine {
 
             var teamSizeValue = 1
             var gameTypeValue = "Regular"
-
-            /*CloudSyncConnector.useTrackedAssets { _, _, componentMetadata ->
-                val pluginDir = File(serverFiles, "plugins/${componentMetadata.uri}")
-                if (pluginDir.exists()) {
-                    val groupConfig = File(pluginDir, "config.yml")
-                    if (groupConfig.exists()) {
-                        val yaml = Yaml()
-                        val data = yaml.load<Map<String, Any>>(groupConfig.inputStream())
-                        teamSizeValue = data["teamSize"] as? Int ?: teamSizeValue
-                        gameTypeValue = data["gameType"] as? String ?: gameTypeValue
-                    }
-                }
-
-                replace(File(serverFiles, "plugins/${componentMetadata.uri}/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
-                replace(File(serverFiles, "plugins/${componentMetadata.uri}/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
-            }*/
-
-            //todo: what the fuck is going on up there bruh
 
             val pluginDir = File(templateDir, "/plugins/" + gameTypeEnum.pluginName)
             if (pluginDir.exists()) {

@@ -35,7 +35,7 @@ object CgsAdminCommands : ScalaCommand() {
     @Subcommand("requestserver")
     @Syntax("<serverGroup> <teamSize> <gameType> <serverName>")
     fun onRequestServer(sender: CommandSender, serverGroup: String, teamSize: Int, gameType: String, serverName: String) {
-        val file = File("/root/templates/$serverGroup")
+        val file = File("/home/templates/templates/$serverGroup")
 
         if (!file.exists()) {
             sender.sendMessage("${CC.RED}No such group or template available for \"$serverGroup\".")
@@ -69,7 +69,7 @@ object CgsAdminCommands : ScalaCommand() {
     @Subcommand("template edit")
     @Syntax("<serverGroup>")
     fun onTemplateEdit(sender: CommandSender, serverGroup: String) {
-        val file = File("/root/templates/$serverGroup")
+        val file = File("/home/templates/templates/$serverGroup")
 
         if (ServerContainer.getServersInGroup(serverGroup) != null || !file.exists()) {
             sender.sendMessage("${CC.RED}There is no such group or template available for the group \"$serverGroup\".")
@@ -95,13 +95,13 @@ object CgsAdminCommands : ScalaCommand() {
         }
 
         val serverGroup = Bukkit.getServerName().split("-")[0]
-        val file = File("/root/templates/$serverGroup")
+        val file = File("/home/templates/templates/$serverGroup")
         if (!file.exists()) {
             sender.sendMessage("${CC.RED}ERROR! Failed to find a template group in the updater directory called: $serverGroup")
-            sender.sendMessage("Updater directory: /root/")
+            sender.sendMessage("Updater directory: /home/templates/")
         }
 
-        val runningDir = File("/root/".replace("/plugins", ""))
+        val runningDir = File("/home/templates/".replace("/plugins", ""))
         if (!runningDir.exists()) {
             sender.sendMessage("${CC.RED}ERROR! Failed to find running directory.")
             return
@@ -150,7 +150,7 @@ object CgsAdminCommands : ScalaCommand() {
 
     @Subcommand("destroyserver")
     fun destroyServer(sender: CommandSender) {
-        if (!"/root/".contains("/temp/")) {
+        if (!"/home/templates/".contains("/temp/")) {
             sender.sendMessage("${CC.RED}This server is not a game server - you cannot destroy this.")
             return
         }

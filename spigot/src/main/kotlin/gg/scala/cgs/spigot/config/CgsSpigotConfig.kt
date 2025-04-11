@@ -8,7 +8,7 @@ import gg.scala.commons.config.annotations.Config
  * @date 11/17/2024
  */
 @Config("config", crossSync = false)
-object CgsSpigotConfig {
+class CgsSpigotConfig {
 
-    val gameType = CgsSpigotPlugin.gameType.displayName
+    var gameType = "POT_SG"
 }
