@@ -1,14 +1,42 @@
 package gg.scala.cgs.common.packet
 
+import gg.scala.aware.AwareBuilder
 import gg.scala.aware.annotation.Subscribe
+import gg.scala.aware.codec.codecs.interpretation.AwareMessageCodec
 import gg.scala.aware.message.AwareMessage
 import gg.scala.cgs.common.CgsGameEngine
+import gg.scala.flavor.service.Close
+import gg.scala.flavor.service.Configure
+import gg.scala.flavor.service.Service
 
 /**
  * @author Topu
  * @date 11/16/2024
  */
+@Service
 object CgsPacketService {
+
+    val aware by lazy {
+        AwareBuilder
+            .of<AwareMessage>("cgs:backbone")
+            .codec(AwareMessageCodec)
+            .build()
+    }
+
+    @Configure
+    fun configure()
+    {
+        aware.listen(this)
+        aware.connect()
+            .toCompletableFuture()
+            .join()
+    }
+
+    @Close
+    fun close()
+    {
+        aware.shutdown()
+    }
 
     @Subscribe("request-server")
     fun onRequestServer(message: AwareMessage)
@@ -88,7 +116,7 @@ object CgsPacketService {
     ): AwareMessage
     {
         return AwareMessage.of(
-            packet, CgsGameEngine.cgsChannel
+            packet, aware
         ).apply {
             for (entry in message)
             {

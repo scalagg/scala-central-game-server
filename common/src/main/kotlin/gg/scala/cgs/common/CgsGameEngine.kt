@@ -25,12 +25,11 @@ import kotlin.properties.Delegates
 class CgsGameEngine {
 
     companion object {
-        private val templatePath = "/home/scala/updater/templates/"
-        private val dockerBase = "/home/scala/docker_instances/base"
-        private val dockerTemp = "/home/scala/docker_instances/temp/"
+        private val templatePath = "/root/templates/"
+        private val dockerBase = "/root/docker_instances/base"
+        private val dockerTemp = "/root/docker_instances/temp/"
 
         val TEMP_SERVERS: MutableList<TempServer> = mutableListOf()
-        var cgsChannel by Delegates.notNull<Aware<AwareMessage>>()
 
         fun findAvailableServerId(group: String): Int {
             // Logic for finding the available server ID, adapted to Kotlin

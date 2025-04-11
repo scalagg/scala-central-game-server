@@ -1,5 +1,6 @@
 package gg.scala.cgs.spigot
 
+import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.spigot.config.CgsSpigotConfig
 import gg.scala.commons.ExtendedScalaPlugin
