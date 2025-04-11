@@ -11,11 +11,13 @@ import org.apache.commons.io.FileUtils
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.io.InputStream
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.properties.Delegates
 
 /**
@@ -29,10 +31,10 @@ class CgsGameEngine {
         private val dockerBase = "/home/templates/docker_instances/base"
         private val dockerTemp = "/home/templates/docker_instances/temp/"
 
+        private val recentServers = ConcurrentHashMap<String, Long>()
         val TEMP_SERVERS: MutableList<TempServer> = mutableListOf()
 
         fun findAvailableServerId(group: String): Int {
-            // Logic for finding the available server ID, adapted to Kotlin
             val filteredCount = TEMP_SERVERS.stream()
                 .filter { it.group.equals(group, ignoreCase = true) }
                 .count() + 1
@@ -56,6 +58,14 @@ class CgsGameEngine {
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
 
+            // Avoid duplicate creation
+            if (isDuplicate(serverName)) {
+                println("[WARN] Ignored duplicate create request for $serverName")
+                return
+            }
+
+            println("[DEBUG] Starting server creation for $serverName...")
+
             val gameTypeEnum = GameType.getGameByDisplayName(group) ?: GameType.valueOf(group.uppercase())
             val templateDir = File("$templatePath$group")
             if (!templateDir.exists() || !templateDir.isDirectory)
@@ -64,23 +74,20 @@ class CgsGameEngine {
             val targetDir = File("$dockerTemp$serverName")
             if (targetDir.exists()) FileUtils.deleteDirectory(targetDir)
 
-            // Find available port
             val port = findFreePort()
 
-            // Copy docker setup
             FileUtils.copyDirectory(File(dockerBase), targetDir)
             replace(File(targetDir, "deploy.sh"), "port=25565", "port=$port")
             replace(File(targetDir, "deploy.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
             replace(File(targetDir, "startup.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
             replace(File(targetDir, "down.sh"), "path=/home/templates/mcdeploy", "path=${targetDir.absolutePath}")
-
             replace(File(targetDir, "deploy.sh"), "servername=CGSServer", "servername=$serverName")
             replace(File(targetDir, "startup.sh"), "servername=CGSServer", "servername=$serverName")
             replace(File(targetDir, "down.sh"), "servername=CGSServer", "servername=$serverName")
 
-            // Copy template
             val serverFiles = File(targetDir, "serverfiles")
-            FileUtils.copyDirectory(templateDir, serverFiles)
+            println("Copying template from ${templateDir.absolutePath} to ${serverFiles.absolutePath}")
+            safeCopyDirectory(templateDir, serverFiles)
 
             replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
             replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
@@ -151,6 +158,25 @@ class CgsGameEngine {
             } catch (e: Exception) {
                 true
             }
+        }
+
+        private fun safeCopyDirectory(src: File, dest: File) {
+            if (!src.exists()) throw IOException("Source directory doesn't exist: ${src.absolutePath}")
+            if (!src.isDirectory) throw IOException("Source is not a directory: ${src.absolutePath}")
+            try {
+                FileUtils.copyDirectory(src, dest)
+            } catch (e: IOException) {
+                println("Error copying directory from ${src.absolutePath} to ${dest.absolutePath}")
+                throw e
+            }
+        }
+
+        private fun isDuplicate(serverName: String): Boolean {
+            val now = System.currentTimeMillis()
+            val last = recentServers[serverName] ?: 0
+            if (now - last < 3000) return true
+            recentServers[serverName] = now
+            return false
         }
     }
 }

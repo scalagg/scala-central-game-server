@@ -34,7 +34,7 @@ class CGSServer {
         val delay = 10000L
         val timer = Timer()
         timer.scheduleAtFixedRate(GenerateGameServerTask(), delay, 5000L)
-        timer.scheduleAtFixedRate(GenerateTeamGameServerTask(), delay, 5000L)
+//        timer.scheduleAtFixedRate(GenerateTeamGameServerTask(), delay, 5000L)
 
         Thread {
             while (running) {

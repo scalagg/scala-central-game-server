@@ -25,8 +25,8 @@ class GenerateTeamGameServerTask : TimerTask() {
 
             var hasInGame = false
 
-           for (server in ServerContainer.getServersInGroup("${value.serverName}")) {
-               if (server == null || server.metadata == null || server.getMetadataValue<String>("game", "stageType") == null || /*!server.getMetadata().has("gameTeamSize")*/ server.getMetadataValue<Int>("game", "gameTeamSize") != null) continue
+           for (server in ServerContainer.getServersInGroup(value.serverName)) {
+               if (server.getMetadataValue<String>("game", "stageType") == null || server.getMetadataValue<Int>("game", "gameTeamSize") != null) continue
                if (server.getMetadataValue<Int>("game", "gameTeamSize") != value.maxTeamSize) continue
 
                onlineServers++
