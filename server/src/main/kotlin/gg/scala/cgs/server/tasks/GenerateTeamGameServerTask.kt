@@ -4,7 +4,7 @@ import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.commons.agnostic.sync.server.ServerContainer
-import java.util.TimerTask
+import java.util.*
 
 class GenerateTeamGameServerTask : TimerTask() {
     private var lastServerRequest = 0L
@@ -27,7 +27,7 @@ class GenerateTeamGameServerTask : TimerTask() {
 
            for (server in ServerContainer.getServersInGroup("${value.serverName}Game")) {
                if (server == null || server.metadata == null || server.getMetadataValue<String>("game", "stageType") == null || /*!server.getMetadata().has("gameTeamSize")*/ server.getMetadataValue<Int>("game", "gameTeamSize") != null) continue
-               if (server.getMetadataValue<Int>("game", "gameTeamSize") != 1) continue
+               if (server.getMetadataValue<Int>("game", "gameTeamSize") != value.maxTeamSize) continue
 
                onlineServers++
 
