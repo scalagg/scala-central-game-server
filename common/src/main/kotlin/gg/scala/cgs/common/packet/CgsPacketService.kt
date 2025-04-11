@@ -41,6 +41,7 @@ object CgsPacketService {
     @Subscribe("request-server")
     fun onRequestServer(message: AwareMessage)
     {
+        println("test1: onRequestServer")
         val serverGroup = message.retrieve("serverGroup") as? String ?: return
         val serverName = message.retrieve("serverName") as? String
         val teamSize = message.retrieve("teamSize") as? Int ?: 1

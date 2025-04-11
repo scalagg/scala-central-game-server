@@ -47,6 +47,7 @@ class CgsGameEngine {
         @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
+            println("test2: createServer")
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
 
             println("[DEBUG] Starting server creation for $serverName...")
