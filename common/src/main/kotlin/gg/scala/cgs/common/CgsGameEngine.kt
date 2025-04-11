@@ -91,7 +91,8 @@ class CgsGameEngine {
                     val inputStream: InputStream = FileInputStream(groupConfig)
                     val yaml = Yaml()
                     val data = yaml.load<Any>(inputStream) as Map<*, *>
-                    println("teamSizeValue = ${data["teamSize"] as Int} && gameTypeValue = ${data["gameType"] as String}")
+                    println("data = $data")
+                    println("teamSizeValue = ${data["teamSize"]} && gameTypeValue = ${data["gameType"]}")
                     teamSizeValue = data["teamSize"] as Int
                     gameTypeValue = data["gameType"] as String
                 }
