@@ -230,7 +230,7 @@ class CgsGameEngine {
 
             println("Started server '$serverName' via Docker!")
 
-            TEMP_SERVERS.add(
+            /*TEMP_SERVERS.add(
                 TempServer(
                     serverName,
                     group,
@@ -238,7 +238,7 @@ class CgsGameEngine {
                     targetDir,
                     System.currentTimeMillis()
                 )
-            )
+            )*/
             //CgsPacketService.buildMessage("velocity-server", mapOf("serverName" to serverName, "address" to "127.0.0.1", "port" to port.toString())).publish()
         }
 
