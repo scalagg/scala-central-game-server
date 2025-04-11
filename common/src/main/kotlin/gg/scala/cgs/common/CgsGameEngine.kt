@@ -91,7 +91,7 @@ class CgsGameEngine {
 
             replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
             replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
-            replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "id: template", "id: $serverName")
+            replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "server-id: template", "server-id: $serverName")
 
             var teamSizeValue = 1
             var gameTypeValue = "Regular"
