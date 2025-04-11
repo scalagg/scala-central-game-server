@@ -1,12 +1,12 @@
 package gg.scala.cgs.server
 
-import gg.scala.cgs.server.tasks.GenerateGameServerTask
-import gg.scala.cgs.server.tasks.GenerateTeamGameServerTask
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.cgs.common.server.TempServer
+import gg.scala.cgs.server.tasks.GenerateGameServerTask
+import gg.scala.cgs.server.tasks.GenerateTeamGameServerTask
 import java.io.*
-import java.util.Timer
+import java.util.*
 import kotlin.system.exitProcess
 
 class CGSServer {
@@ -44,16 +44,18 @@ class CGSServer {
                 val toRemove: MutableList<TempServer> = ArrayList()
 
                 for (server in CgsGameEngine.TEMP_SERVERS) {
-                    val lastText: String = server.lastText
+                    val lastText = server.lastText
+                    var lastDockerText = server.lastText
+
                     if (!server.shouldRemove()) continue
 
-                    val lastDockerText: String = server.getLastStringFromDocker()
-
-
+                    try {
+                        lastDockerText = server.getLastStringFromDocker()
+                    } catch (ignored: IOException) {
+                    }
 
                     if (!lastDockerText.equals("Shutdown auto update", ignoreCase = true)) {
                         if (lastText != lastDockerText) server.lastText = lastDockerText
-
                         println("$lastText - $lastDockerText")
 
                         if (lastText != lastDockerText) {
@@ -62,23 +64,23 @@ class CGSServer {
                         }
                     }
 
+
                     if (broken.contains(server)) continue
 
-                    println("[CGS] Removing server '${server.name}'. (d: ${System.currentTimeMillis() - server.startedAt}, r: ${server.isRunning()})")
+                    println("[CGS] Removing server '" + server.name + "'. (d: " + (System.currentTimeMillis() - server.startedAt) + ", r: " + server.isRunning() + ")")
 
                     toRemove.add(server)
 
-
                     try {
                         server.destroy()
-                    } catch (ex: java.lang.Exception) {
-                        System.err.println("[CGS] Couldn't destroy '${server.name}'!")
+                    } catch (ex: Exception) {
+                        System.err.println("[CGS] Couldn't destroy '" + server.name + "'!")
                         ex.printStackTrace()
-                        CgsPacketService.buildMessage("game-server",
-                            mapOf(
-                                "serverName" to server.name,
-                                "message" to "Failed to destroy '${server.name}': ${ex.message}")
-                            )
+                        CgsPacketService.buildMessage(
+                            "game-server",
+                            mapOf("serverName" to server.name,
+                                "message" to "Failed to destroy '" + server.name + "': " + ex.message)
+                        ).publish()
                     }
                 }
 
@@ -86,7 +88,7 @@ class CGSServer {
                     CgsGameEngine.TEMP_SERVERS.removeAll(toRemove)
                 } catch (ex: Exception) {
                     broken.addAll(toRemove)
-                    println("[CGS] Failed to remove some servers, marked them as broken. (${toRemove.size}, ${broken.size})")
+                    println("[CGS] Failed to remove some servers, marked them as broken. (" + toRemove.size + ", " + broken.size + ")")
                 }
             }
         }.start()
