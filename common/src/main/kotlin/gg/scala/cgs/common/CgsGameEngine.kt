@@ -1,12 +1,9 @@
 package gg.scala.cgs.common
 
-import gg.scala.aware.Aware
-import gg.scala.aware.message.AwareMessage
 import gg.scala.aware.thread.AwareThreadContext
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.cgs.common.server.TempServer
-import gg.scala.cloudsync.shared.connection.CloudSyncConnector
 import org.apache.commons.io.FileUtils
 import org.yaml.snakeyaml.Yaml
 import java.io.File
@@ -17,8 +14,6 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.properties.Delegates
 
 /**
  * @author Topu
@@ -91,14 +86,30 @@ class CgsGameEngine {
                     val inputStream: InputStream = FileInputStream(groupConfig)
                     val yaml = Yaml()
                     val data = yaml.load<Any>(inputStream) as Map<*, *>
+
                     println("data = $data")
-                    println("teamSizeValue = ${data["teamSize"]} && gameTypeValue = ${data["gameType"]}")
+                    println("teamSizeValue = ${data["teamSize"]}")
                     teamSizeValue = data["teamSize"] as Int
+                }
+
+
+                replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
+            }
+
+            val spigotPluginDir = File(templateDir, "/plugins/cgs-spigot")
+            if (spigotPluginDir.exists()) {
+                val spigotPluginConfig = File(spigotPluginDir, "/config.yml")
+                if (spigotPluginConfig.exists()) {
+                    val inputStream: InputStream = FileInputStream(spigotPluginConfig)
+                    val yaml = Yaml()
+                    val data = yaml.load<Any>(inputStream) as Map<*, *>
+
+                    println("data = $data")
+                    println("gameTypeValue = ${data["gameType"]}")
                     gameTypeValue = data["gameType"] as String
                 }
 
-                replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "teamSize: $teamSizeValue", "teamSize: $teamSize")
-                replace(File(serverFiles, "plugins/" + gameTypeEnum.pluginName + "/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
+                replace(File(serverFiles, "plugins/cgs-spigot/config.yml"), "gameType: $gameTypeValue", "gameType: $gameType")
             }
 
             setPermissions(targetDir)
