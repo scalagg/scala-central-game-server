@@ -71,7 +71,7 @@ object CgsAdminCommands : ScalaCommand() {
     fun onTemplateEdit(sender: CommandSender, serverGroup: String) {
         val file = File("/home/templates/templates/$serverGroup")
 
-        if (ServerContainer.getServersInGroup(serverGroup) != null || !file.exists()) {
+        if (!file.exists()) {
             sender.sendMessage("${CC.RED}There is no such group or template available for the group \"$serverGroup\".")
             return
         }
