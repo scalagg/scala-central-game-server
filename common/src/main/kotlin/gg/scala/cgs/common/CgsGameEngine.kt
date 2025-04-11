@@ -5,6 +5,7 @@ import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.cgs.common.server.TempServer
 import org.apache.commons.io.FileUtils
+import org.apache.logging.log4j.message.AsynchronouslyFormattable
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
@@ -43,6 +44,7 @@ class CgsGameEngine {
             return -1
         }
 
+        @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
