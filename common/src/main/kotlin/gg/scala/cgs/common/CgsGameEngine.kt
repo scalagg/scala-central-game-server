@@ -116,15 +116,6 @@ class CgsGameEngine {
             startServer(targetDir)
 
             TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
-
-            CgsPacketService.buildMessage(
-                "velocity-server",
-                mapOf(
-                    "serverName" to serverName,
-                    "serverHost" to "127.0.0.1",
-                    "port" to port.toString()
-                )
-            ).publish(AwareThreadContext.SYNC)
         }
 
         private fun replace(file: File, from: String, to: String) {

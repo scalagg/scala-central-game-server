@@ -98,18 +98,6 @@ object CgsPacketService {
         println("Received message for server $serverName: $messageContent")
     }
 
-    @Subscribe("velocity-server")
-    fun onVelocityServer(message: AwareMessage)
-    {
-        val serverName = message.retrieve("serverName") as? String ?: return
-        val serverHost = message.retrieve("serverHost") as? String ?: return
-        val port = message.retrieve("port") as? Int ?: 0
-        val create = message.retrieve("create") as? Boolean ?: false
-
-        println("Received packet for server: $serverName, Host: $serverHost, Port: $port, Create: $create")
-    }
-
-
     fun buildMessage(
         packet: String,
         message: Map<String, String>

@@ -31,11 +31,6 @@ data class TempServer(
 
     @Throws(Exception::class)
     fun destroy() {
-        CgsPacketService.buildMessage(
-            "velocity-server",
-            mapOf("serverName" to name)
-        ).publish(AwareThreadContext.SYNC)
-
         ProcessBuilder("sudo", "chown", "scala:scala", "serverfiles")
             .directory(directory)
             .start()
