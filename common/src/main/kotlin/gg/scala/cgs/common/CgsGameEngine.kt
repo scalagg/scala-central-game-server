@@ -3,8 +3,6 @@ package gg.scala.cgs.common
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.cgs.common.server.TempServer
-import gg.scala.store.connection.redis.impl.DataStoreRedisConnection
-import gg.scala.store.connection.redis.impl.details.DataStoreRedisConnectionDetails
 import org.apache.commons.io.FileUtils
 import org.yaml.snakeyaml.Yaml
 import redis.clients.jedis.JedisPool
@@ -34,10 +32,10 @@ class CgsGameEngine {
             CgsPacketService.init(
                 JedisPool(
                     JedisPoolConfig(),
-                    "",
+                    "172.18.0.1",
                     6379,
                     2000,
-                    "",
+                    "mmJsasamn8tVpKnzOPsrCrH0XFn8raHE",
                     0,
                 ), "cgs-packets"
             )
@@ -103,7 +101,7 @@ class CgsGameEngine {
                     val inputStream: InputStream = FileInputStream(groupConfig)
                     val yaml = Yaml()
                     val data = yaml.load<Any>(inputStream) as Map<*, *>
-                    teamSizeValue = data["teamSize"] as Int
+                    teamSizeValue = data["teamSize"] as? Int ?: teamSizeValue
                 }
 
 
@@ -117,14 +115,32 @@ class CgsGameEngine {
                     val inputStream: InputStream = FileInputStream(spigotPluginConfig)
                     val yaml = Yaml()
                     val data = yaml.load<Any>(inputStream) as Map<*, *>
-                    gameTypeValue = data["gameType"] as String
+                    gameTypeValue = data["gameType"] as? String ?: gameTypeValue
                 }
 
                 replace(File(serverFiles, "plugins/cgs-spigot/config.yml"), "game-type: $gameTypeValue", "game-type: $gameType")
             }
 
+            println("[DEBUG] Setting permissions for $serverName...")
             setPermissions(targetDir)
-            startServer(targetDir)
+            println("[DEBUG] Starting server $serverName...")
+
+            // fix perms
+            ProcessBuilder("chown", "-R", "root:root", serverFiles.absolutePath).start()
+            ProcessBuilder("chmod", "-R", "0755", serverFiles.absolutePath).start()
+            ProcessBuilder("chmod", "+x", File(serverFiles, "start.sh").absolutePath).start()
+            ProcessBuilder("chmod", "+x", File(targetDir, "deploy.sh").absolutePath).start()
+            ProcessBuilder("chmod", "+x", File(targetDir, "down.sh").absolutePath).start()
+            ProcessBuilder("chmod", "+x", File(targetDir, "startup.sh").absolutePath).start()
+
+
+            // start server
+            ProcessBuilder("./deploy.sh")
+                .directory(targetDir)
+                .start()
+
+            println("[CGS] Started server '$serverName' via Docker!")
+//            startServer(targetDir)
 
             TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
         }
