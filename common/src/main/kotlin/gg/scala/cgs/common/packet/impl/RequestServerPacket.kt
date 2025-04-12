@@ -49,22 +49,27 @@ class RequestServerPacket : Packet {
     }
 
     override fun onReceive() {
-        if (CgsGameEngine.systemType == SystemType.UNKNOWN) {
-            println("[Game Manager] Detected a request for a server with the group: $serverGroup")
+        if (CgsGameEngine.systemType != SystemType.UNKNOWN)
+            return
+        println("[Game Manager] Detected a request for a server with the group: $serverGroup")
 
-            var generatedName = "${serverName ?: serverGroup}-NA"
-            if (serverName == null) {
-                generatedName = "$serverGroup-${CgsGameEngine.findAvailableServerId(serverGroup)}-NA"
-            }
+        var generatedName = "${serverName ?: serverGroup}-na"
+        if (serverName == null) {
+            generatedName = "$serverGroup-${CgsGameEngine.findAvailableServerId(serverGroup)}-na"
+        }
 
-            println("generatedName = $generatedName, serverGroup = $serverGroup, teamSize = $teamSize, gameType = $gameType")
+        println("generatedName = $generatedName, serverGroup = $serverGroup, teamSize = $teamSize, gameType = $gameType")
 
-            try {
-                CgsGameEngine.createServer(generatedName, serverGroup, teamSize, gameType)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                CgsPacketService.sendToAll(GameServerPacket(generatedName, "Failed to create '$generatedName': ${ex.message}"))
-            }
+        try {
+            CgsGameEngine.createServer(generatedName, serverGroup, teamSize, gameType)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            CgsPacketService.sendToAll(
+                GameServerPacket(
+                    generatedName,
+                    "Failed to create '$generatedName': ${ex.message}"
+                )
+            )
         }
     }
 }

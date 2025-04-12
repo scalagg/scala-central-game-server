@@ -24,6 +24,7 @@ class CgsPacketService private constructor() {
 
         private fun connectToServer(connectTo: JedisPool) {
             println("[CGS] Connecting to CGS Packet System.")
+
             val subscribeThread = Thread({
                 while (true) {
                     try {
@@ -34,6 +35,7 @@ class CgsPacketService private constructor() {
                             jedis!!.subscribe(pubSub, jedisChannel)
                         } catch (pubSub: Throwable) {
                             throwable = pubSub
+                            throwable.printStackTrace()
                             throw pubSub
                         } finally {
                             if (jedis == null) continue
@@ -41,6 +43,7 @@ class CgsPacketService private constructor() {
                                 try {
                                     jedis.close()
                                 } catch (pubSub: Throwable) {
+                                    pubSub.printStackTrace()
                                     throwable.addSuppressed(pubSub)
                                 }
                                 continue

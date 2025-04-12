@@ -25,20 +25,21 @@ import java.util.*
 class CgsGameEngine {
 
     companion object {
-        private val templatePath = "/home/templates/templates/"
-        private val dockerBase = "/home/templates/docker_instances/base"
-        private val dockerTemp = "/home/templates/docker_instances/temp/"
+        private val templatePath = "/opt/event-templates/templates/"
+        private val dockerBase = "/opt/event-templates/docker_instances/base"
+        private val dockerTemp = "/opt/event-templates/docker_instances/temp/"
         var systemType: SystemType = SystemType.UNKNOWN
 
         fun initPacketHandler() {
             systemType = currentSystemType()
+
             CgsPacketService.init(
                 JedisPool(
                     JedisPoolConfig(),
-                    "172.18.0.1",
-                    6379,
+                    "38.114.240.186",
+                    4322,
                     2000,
-                    "mmJsasamn8tVpKnzOPsrCrH0XFn8raHE",
+                    "59U20W3h6PwNidHcjf2F11oZjgDpHH1AvAKw5",
                     0,
                 ), "cgs-packets"
             )
@@ -107,6 +108,7 @@ class CgsGameEngine {
             replace(File(serverFiles, "server.properties"), "server-name=template", "server-name=$serverName")
             replace(File(serverFiles, "server.properties"), "server-port=25565", "server-port=$port")
             replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "server-id: template", "server-id: $serverName")
+            replace(File(serverFiles, "plugins/scala-commons/serversync.yml"), "advertisedServerAddress: 127.0.0.1:25565", "advertisedServerAddress: 127.0.0.1:$port")
 
             var teamSizeValue = 1
             var gameTypeValue = "Regular"
@@ -150,10 +152,12 @@ class CgsGameEngine {
             ProcessBuilder("chmod", "+x", File(targetDir, "down.sh").absolutePath).start()
             ProcessBuilder("chmod", "+x", File(targetDir, "startup.sh").absolutePath).start()
 
-
+            println(targetDir)
             // start server
             ProcessBuilder("./deploy.sh")
                 .directory(targetDir)
+                .redirectOutput(File("/home/container/retard.output"))
+                .redirectError(File("/home/container/retard.error"))
                 .start()
 
             println("[CGS] Started server '$serverName' via Docker!")
