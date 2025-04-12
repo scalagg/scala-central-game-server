@@ -1,6 +1,7 @@
 package gg.scala.cgs.spigot.commands
 
 import gg.scala.basics.plugin.commands.admin.ShutdownCommand
+import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.packet.CgsPacketService
 import gg.scala.cgs.common.packet.impl.RequestServerPacket
 import gg.scala.commons.acf.CommandHelp
@@ -137,6 +138,11 @@ object CgsAdminCommands : ScalaCommand() {
             Bukkit.broadcastMessage(e.toString())
             e.printStackTrace()
         }
+    }
+
+    @Subcommand("systemtype")
+    fun systemType(sender: CommandSender) {
+        sender.sendMessage("${CC.SEC}System Type: ${CC.PRI}${CgsGameEngine.currentSystemType()}")
     }
 
     @Subcommand("destroyserver")

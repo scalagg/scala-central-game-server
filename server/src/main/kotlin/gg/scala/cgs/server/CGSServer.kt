@@ -12,7 +12,7 @@ import kotlin.system.exitProcess
 
 class CGSServer {
 
-    var instance: CGSServer? = null
+    lateinit var instance: CGSServer
     private var running: Boolean = true
     private val broken: MutableList<TempServer> = ArrayList<TempServer>() // lol
 
@@ -21,17 +21,9 @@ class CGSServer {
     }
 
     fun start() {
-        println("[CGS] Loading Config...")
-        val cgsConfigFile = File("config.yml")
-
-        if (!cgsConfigFile.exists()) {
-            println("[CGS] CGS config not found...")
-            exitProcess(0)
-        }
-        println("[CGS] Loaded Config.")
-
         println("[CGS] Loading CGS Packet Service...")
         CgsGameEngine.initPacketHandler()
+        println("[CGS] Loaded CGS System Type: ${CgsGameEngine.currentSystemType()}.")
         println("[CGS] Loaded CGS Packet Service.")
 
         val delay = 10000L

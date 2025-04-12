@@ -1,6 +1,7 @@
 package gg.scala.cgs.common.packet
 
 import com.google.gson.Gson
+import gg.scala.cgs.common.util.SystemType
 import redis.clients.jedis.JedisPubSub
 
 /**
@@ -15,28 +16,34 @@ internal class PacketPubSub : JedisPubSub() {
         println("[CGS] $channel: Received packet: $message")
 
         val packetMessageSplit = message.indexOf("||")
-        if (packetMessageSplit == -1) return
-
         val packetClassStr = message.substring(0, packetMessageSplit)
-        val messageJson = message.substring(packetMessageSplit + 2)
+        val messageJson = message.substring(packetMessageSplit + "||".length)
+        val packageLayout = "gg.scala.cgs."
 
-        val packetClass: Class<*> = try {
-            Class.forName(packetClassStr)
-        } catch (e: ClassNotFoundException) {
-            println("Could not find class for packet: $packetClassStr")
-            return
-        }
+        var packetClass: Class<*>? = null
 
-        try {
-            val packetObj = gson.fromJson(messageJson, packetClass)
-            if (packetObj is Packet) {
-                packetObj.onReceive()
-            } else {
-                println("Received object is not a Packet: $packetObj")
+        for (value in SystemType.entries) {
+            try {
+                packetClass = Class.forName(
+                    packetClassStr.replace(
+                        "${packageLayout}common",
+                        packageLayout + value.name.lowercase()
+                    )
+                )
+                break
+            } catch (_: ClassNotFoundException) {
             }
-        } catch (e: Exception) {
-            println("Failed to deserialize packet: $packetClassStr")
-            e.printStackTrace()
         }
+
+        if (packetClass == null) {
+            try {
+                packetClass = Class.forName(packetClassStr)
+            } catch (_: Exception) {
+                return
+            }
+        }
+
+        val packet = gson.fromJson(messageJson, packetClass) as Packet
+        packet.onReceive()
     }
 }

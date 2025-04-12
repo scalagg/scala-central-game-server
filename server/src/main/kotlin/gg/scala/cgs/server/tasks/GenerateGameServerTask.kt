@@ -24,7 +24,7 @@ class GenerateGameServerTask : TimerTask() {
             var onlineServers = 0
             var hasInGame = false
 
-            val servers = ServerContainer.getServersInGroup(gameType.serverName)
+            val servers = ServerContainer.getServersInGroup(gameType.serverName.lowercase())
             for (server in servers) {
                 val gameStage = server.getMetadataValue<String>("game", "stageType")
                 val teamSize = server.getMetadataValue<Int>("game", "gameTeamSize")

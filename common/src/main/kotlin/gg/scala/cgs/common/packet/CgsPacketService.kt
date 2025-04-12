@@ -22,7 +22,7 @@ class CgsPacketService private constructor() {
             connectToServer(pool)
         }
 
-        fun connectToServer(connectTo: JedisPool) {
+        private fun connectToServer(connectTo: JedisPool) {
             println("[CGS] Connecting to CGS Packet System.")
             val subscribeThread = Thread({
                 while (true) {
