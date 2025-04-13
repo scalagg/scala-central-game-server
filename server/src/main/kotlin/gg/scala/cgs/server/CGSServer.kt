@@ -44,7 +44,6 @@ class CGSServer {
                     val lastText = server.lastText
                     var lastDockerText = server.lastText
 
-                    println("Running: ${server.isRunning()}")
                     if (!server.shouldRemove()) continue
 
                     try {

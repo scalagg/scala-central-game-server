@@ -156,8 +156,6 @@ class CgsGameEngine {
             // start server
             ProcessBuilder("./deploy.sh")
                 .directory(targetDir)
-                .redirectOutput(File("/home/container/retard.output"))
-                .redirectError(File("/home/container/retard.error"))
                 .start()
 
             println("[CGS] Started server '$serverName' via Docker!")
