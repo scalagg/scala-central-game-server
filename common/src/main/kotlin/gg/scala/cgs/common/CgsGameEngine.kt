@@ -17,6 +17,7 @@ import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * @author Topu
@@ -89,6 +90,12 @@ class CgsGameEngine {
         @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
+            createServer(serverName, group, teamSize, gameType, null)
+        }
+
+        @Synchronized
+        @Throws(Exception::class)
+        fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String, consumer: Consumer<String>?) {
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
 
             println("[DEBUG] Starting server creation for $serverName...")
@@ -171,6 +178,8 @@ class CgsGameEngine {
             println("[CGS] Started server '$serverName' via Docker!")
 
             TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
+
+            consumer?.accept(serverName)
         }
 
         private fun replace(file: File, from: String, to: String) {
