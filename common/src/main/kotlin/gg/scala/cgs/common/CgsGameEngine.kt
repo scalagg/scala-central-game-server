@@ -87,13 +87,11 @@ class CgsGameEngine {
             return folderNames
         }
 
-        @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
             createServer(serverName, group, teamSize, gameType, null)
         }
 
-        @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String, consumer: Consumer<String>?) {
             if (serverName == null) throw IllegalArgumentException("inputServerName cannot be null")
