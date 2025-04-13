@@ -11,7 +11,7 @@ plugins {
 
 allprojects {
     group = "gg.scala.cgs"
-    version = "1.5.1"
+    version = "1.5.2"
 
     repositories {
         mavenCentral()
