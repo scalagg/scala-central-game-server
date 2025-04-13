@@ -153,13 +153,12 @@ class CgsGameEngine {
             ProcessBuilder("chmod", "+x", File(targetDir, "startup.sh").absolutePath).start()
 
             println(targetDir)
-            // start server
+
             ProcessBuilder("./deploy.sh")
                 .directory(targetDir)
                 .start()
 
             println("[CGS] Started server '$serverName' via Docker!")
-//            startServer(targetDir)
 
             TEMP_SERVERS.add(TempServer(serverName, group, port, targetDir, System.currentTimeMillis()))
         }
@@ -178,12 +177,6 @@ class CgsGameEngine {
             listOf("chmod", "-R", "0755", targetDir.absolutePath).runCommand()
             listOf("chmod", "+x", "${targetDir.absolutePath}/deploy.sh").runCommand()
             listOf("chmod", "+x", "${targetDir.absolutePath}/startup.sh").runCommand()
-        }
-
-        private fun startServer(targetDir: File) {
-            ProcessBuilder("./deploy.sh")
-                .directory(targetDir)
-                .start()
         }
 
         private fun List<String>.runCommand() {
