@@ -76,6 +76,16 @@ class CgsGameEngine {
             return -1
         }
 
+        fun getTemplates() : List<String> {
+            val directory = File(templatePath)
+            val folderNames = mutableListOf<String>()
+            directory.listFiles()
+                ?.filter { it.isDirectory }
+                ?.forEach { folderNames.add(it.name) }
+
+            return folderNames
+        }
+
         @Synchronized
         @Throws(Exception::class)
         fun createServer(serverName: String?, group: String, teamSize: Int, gameType: String) {
