@@ -78,7 +78,7 @@ class ScGameFramework : ExtendedScalaPlugin()
     }
 
     /**
-     * Helper function to schedule a repeating task
+     * Helper function to schedule a repeating runnable
      */
     private fun scheduleRepeatingTask(interval: Long, task: () -> Unit) {
         Bukkit.getScheduler().runTaskTimer(this, Runnable(task), interval, interval)

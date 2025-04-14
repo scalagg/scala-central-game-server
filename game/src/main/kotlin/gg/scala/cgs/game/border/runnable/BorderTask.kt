@@ -42,7 +42,7 @@ class BorderTask(private val border: Border) : BukkitRunnable() {
     }
 
     fun start() {
-        // Functionality is handled in the constructor with the asynchronous task
+        // Functionality is handled in the constructor with the asynchronous runnable
     }
 
     fun setAction(action: BorderAction): BorderTask {

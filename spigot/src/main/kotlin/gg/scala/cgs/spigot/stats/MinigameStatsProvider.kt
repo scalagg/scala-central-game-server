@@ -46,7 +46,7 @@ class MinigameStatsProvider(
         val profileDocument: Document =
             ScalaDataStoreSpigot.INSTANCE.client!!.getDatabase(name + "-" + CgsSpigotPlugin.season)
                 .getCollection("players").find(
-                    Filters.eq<String>("uuid", uuid.toString())
+                    Filters.eq("uuid", uuid.toString())
                 ).first()
                 ?: return null
         val relaxed = JsonWriterSettings.builder().outputMode(JsonMode.RELAXED).build()

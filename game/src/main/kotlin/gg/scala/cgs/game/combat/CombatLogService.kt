@@ -1,7 +1,5 @@
 package gg.scala.cgs.game.combat
 
-import gg.scala.cgs.game.deathmessage.DeathMessageConfig
-import gg.scala.cgs.game.deathmessage.DeathMessageService
 import gg.scala.flavor.service.Service
 import java.util.*
 

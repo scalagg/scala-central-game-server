@@ -36,7 +36,6 @@ subprojects {
 
     dependencies {
         compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
-        implementation("redis.clients:jedis:2.8.0")
 
         compileOnly("gg.scala.lemon:bukkit:1.9.0")
         compileOnly("gg.scala.spigot:server:1.1.0")
@@ -49,7 +48,7 @@ subprojects {
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
 
         compileOnly("gg.scala.commons:bukkit:4.0.1")
-//        kapt("gg.scala.commons:bukkit:4.0.1")
+        kapt("gg.scala.commons:bukkit:4.0.1")
     }
 
     kotlin {

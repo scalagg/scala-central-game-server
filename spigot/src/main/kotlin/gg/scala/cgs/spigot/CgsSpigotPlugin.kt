@@ -3,14 +3,15 @@ package gg.scala.cgs.spigot
 import gg.scala.cgs.common.CgsGameEngine
 import gg.scala.cgs.common.game.GameType
 import gg.scala.cgs.spigot.config.CgsSpigotConfig
+import gg.scala.cgs.spigot.runnable.TransferPlayerRunnable
 import gg.scala.commons.ExtendedScalaPlugin
 import gg.scala.commons.agnostic.sync.ServerSync
-import gg.scala.commons.agnostic.sync.server.ServerContainer
 import gg.scala.commons.annotations.container.ContainerEnable
 import gg.scala.commons.core.plugin.*
 import org.bukkit.Bukkit
 import java.util.*
 import java.util.stream.Collectors
+
 
 /**
  * @author Topu
@@ -63,5 +64,6 @@ class CgsSpigotPlugin : ExtendedScalaPlugin() {
         if (ServerSync.getLocalGameServer().groups.contains("hub")) {
             gameType = null
         }
+        Bukkit.getScheduler().runTaskTimer(this, TransferPlayerRunnable(), 0, 100)
     }
 }

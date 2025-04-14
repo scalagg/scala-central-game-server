@@ -13,6 +13,7 @@ enum class GameType(
     val maxTeamSize: Int,
     val maxTeamServers: Int,
     val autoCreateServers: Boolean,
+    val publicHostAllowed: Boolean,
     val publicStats: Boolean,
     val material: String,
     val materialData: Short
@@ -31,9 +32,10 @@ enum class GameType(
         maxTeamSize = 5,
         maxTeamServers = 2,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
-        material = "WOOL",
-        materialData = 14
+        material = "BEACON",
+        materialData = 0
     ),
     POT_SG(
         displayName = "PotSG",
@@ -50,6 +52,7 @@ enum class GameType(
         maxTeamSize = 2, // TODO: temporary
         maxTeamServers = 0,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
         material = "CHEST",
         materialData = 0
@@ -69,6 +72,7 @@ enum class GameType(
         maxTeamSize = 1,
         maxTeamServers = 0,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
         material = "RAW_FISH",
         materialData = 0
@@ -87,8 +91,9 @@ enum class GameType(
         maxTeamSize = 2,
         maxTeamServers = 3,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
-        material = "GOLDEN_APPLE",
+        material = "APPLE",
         materialData = 0
     ),
     UHC(
@@ -104,13 +109,14 @@ enum class GameType(
         maxTeamSize = 100,
         maxTeamServers = 0,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
         material = "GOLDEN_APPLE",
         materialData = 0
     ),
     SKYWARS(
         displayName = "SkyWars",
-        maxPartySize = 4,
+        maxPartySize = 2,
         serverName = "SkyWars",
         pluginName = "SkyWars",
         description = listOf(
@@ -118,11 +124,12 @@ enum class GameType(
             "Loot chests, eliminate players,",
             "and be the last one standing!"
         ),
-        maxTeamSize = 4,
+        maxTeamSize = 2,
         maxTeamServers = 0,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
-        material = "FEATHER",
+        material = "BOW",
         materialData = 0
     ),
     BEDWARS(
@@ -138,6 +145,7 @@ enum class GameType(
         maxTeamSize = 8,
         maxTeamServers = 0,
         autoCreateServers = false,
+        publicHostAllowed = true,
         publicStats = true,
         material = "BED",
         materialData = 0
